@@ -12,10 +12,14 @@ from collections import defaultdict
 
 app = FastAPI()
 
+origins = [
+    "https://traffic-signs-detection.vercel.app",
+]
+
 # Allow frontend (React Vite) to connect
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],  # Change to your Vite frontend URL
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
