@@ -135,19 +135,27 @@ async def upload_video(file: UploadFile = File(...)):
         with video_results_lock:
             video_results.clear()
 
-        # Initialize pipeline for this specific video
-        pipeline = InferencePipeline.init_with_workflow(
-            api_key=config.roboflow_api,
-            workspace_name="orpf",
-            workflow_id="detect-and-visualize",
-            video_reference=temp_path,
-            max_fps=30,
-            on_prediction=my_sink
-        )
+        try:
+            # Initialize pipeline for this specific video
+            pipeline = InferencePipeline.init_with_workflow(
+                api_key=config.roboflow_api,
+                workspace_name="orpf",
+                workflow_id="detect-and-visualize",
+                video_reference=temp_path,
+                max_fps=30,
+                on_prediction=my_sink
+            )
 
-        # Start and wait for it to complete
-        pipeline.start()
-        pipeline.join()
+            # Start and wait for it to complete
+            pipeline.start()
+            pipeline.join()
+
+        except Exception as e:
+            print("Pipeline error:", str(e))
+            return JSONResponse(
+                content={"error": "Pipeline failed", "details": str(e)},
+                status_code=500
+            )
 
         # Return all collected predictions
         with video_results_lock:
