@@ -3,6 +3,7 @@ from inference import InferencePipeline
 from fastapi import FastAPI, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+import uvicorn
 import os
 import tempfile
 import threading
@@ -19,7 +20,7 @@ origins = [
 # Allow frontend (React Vite) to connect
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -177,3 +178,6 @@ async def upload_video(file: UploadFile = File(...)):
             except PermissionError:
                 time.sleep(0.5)
                 os.unlink(temp_path)
+
+if __name__ == "__main__":
+    uvicorn.run("main:app", host="0.0.0.0", port=8000)
